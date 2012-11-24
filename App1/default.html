@@ -1,0 +1,297 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>App1</title>
+
+    <!-- WinJS references -->
+    <link href="//Microsoft.WinJS.1.0/css/ui-dark.css" rel="stylesheet" />
+    <script src="//Microsoft.WinJS.1.0/js/base.js"></script>
+    <script src="//Microsoft.WinJS.1.0/js/ui.js"></script>
+
+    <!-- App1 references -->
+    <link href="/css/default.css" rel="stylesheet" />
+    <script src="/js/default.js"></script>
+</head>
+<body>
+    <script>
+        var aaa = document.body.clientWidth;
+        var bbb = document.body.clientHeight;
+        var ccc = aaa > bbb ? bbb : aaa;
+
+    </script>
+    <div id="ddd">
+        <button id="resetbutton" type="button" onclick="onresetall()">再来一局</button>
+        <button id="undo" type="button" onclick="onundo()">悔棋</button>
+        <canvas id="canvas" width="300" height="300"></canvas>
+        <button id="dummy1" type="button"></button>
+        <button id="dummy2" type="button"></button>
+    </div>
+
+    <script>
+        var steps = new Array();
+        var dirs = new Array(1, 2, 3, 4, 5, 6, 7, 8);
+        var seezed = new Array(15 * 15);
+        var canvas = document.getElementById("canvas");
+        canvas.width = ccc - 30;
+        canvas.height = canvas.width;
+        canvas.style.position = "fix"
+        var context = canvas.getContext("2d");
+        var margin = canvas.width / 16;
+        var num = 0;
+
+
+        function hideShowElement(id, visible) {
+             document.getElementById(id).style.visibility = visible ? "visible":"hidden";
+
+            //document.getElementById(id).style.display = visible ? "inline" : "none";
+        }
+        function getElementVisibility(id) {
+            return document.getElementById(id).style.visibility == "hidden" ? false : true;
+        }
+        function toggleButtonsVisibility() {
+
+            var btns = ["resetbutton", "undo"];
+            for (var i = 0; i < btns.length; i++) {
+                var v = getElementVisibility(btns[i]);
+
+                hideShowElement(btns[i], !v);
+            }
+        }
+        function hideShowButtons(visible) {
+            var btns = ["resetbutton", "undo"];
+            for (var i = 0; i < btns.length; i++) {
+                hideShowElement(btns[i], visible);
+            }
+            hideShowElement("dummy1", false);
+            hideShowElement("dummy2", false);
+        }
+
+        document.onclick = function onDocumentClick() {
+            var aaa = event.srcElement.id;
+            if (aaa != "canvas") {
+                toggleButtonsVisibility();
+            }
+        }
+
+
+        hideShowButtons(false);
+
+
+        initgame();
+
+        canvas.addEventListener("click", onclick, false);
+
+        function onundo() {
+            var mysteps = steps;
+            initgame();
+            mysteps.pop();
+            playsaved(mysteps);
+
+        }
+
+        function playsaved(steps) {
+
+            for (var i = 0; i < steps.length; i++) {
+                play(steps[i]);
+            }
+        }
+
+
+        function onresetall(e) {
+            canvas.width = canvas.width;
+            initgame();
+        }
+
+        function initgame() {
+            for (var i = 0; i < seezed.length; i++) {
+                seezed[i] = 0;
+            }
+            num = 0;
+            steps = new Array();
+            drawBackground();
+        }
+
+
+        function getCircleColor(num) {
+            return (num % 2 == 0) ? "#ffffff" : "#000000";
+        }
+
+        function onclick(e) {
+            var p = { x: myi(e.offsetX), y: myi(e.offsetY) };
+            if (!valid(p)) {
+                return;
+            }
+            if (getseezed(p) > 0) {
+                // already seezed, just return.
+                return;
+            }
+            play(p);
+        }
+
+        function valid(p) {
+            return 0 <= p.x && p.x < 15 && 0 <= p.y && p.y < 15;
+        }
+
+        function play(p) {
+            hideShowButtons(false);
+            steps.push(p);
+            num++;
+            drawCircle(p, getCircleColor(num), num);
+            setseezed(p, num);
+            var n = new Array(dirs.length);
+            for (var i = 0; i < dirs.length; i++) {
+                var q = next(p, dirs[i]);
+                n[i] = 0;
+                while (getseezed(q) > 0
+                    && (getseezed(q) - getseezed(p)) % 2 == 0
+                    ) {
+                    n[i]++;
+                    if (n[i] >= 5) { break; }
+                    q = next(q, dirs[i]);
+                }
+            }
+            for (var i = 0; i < n.length / 2; i++) {
+
+                if (1 + n[i] + n[opp(i)] >= 5) {
+                    hideShowButtons(true);
+                    var q = p;
+                    for (var k = 0; k < n[i]; k++) {
+                        q = next(q, dirs[i]);
+                    }
+                    drawline(p, q);
+                    q = p;
+                    for (var k = 0; k < n[opp(i)]; k++) {
+                        q = next(q, dirs[opp(i)]);
+                    }
+                    drawline(p, q);
+                }
+            }
+
+        }
+
+        function opp(i) {
+            return (i + dirs.length / 2) % dirs.length;
+        }
+
+
+        function setseezed(p, n) {
+            seezed[p.x * 15 + p.y] = n;
+        }
+
+        function getseezed(p) {
+            return seezed[p.x * 15 + p.y];
+        }
+
+        function myi(x) {
+            return parseInt(x / margin + 0.5) - 1;
+        }
+        function next(p, d) {
+            // TODO: boundary condition checking
+            if (d == dirs[0])
+                return { x: p.x, y: p.y - 1 };
+            else if (d == dirs[1])
+                return { x: p.x + 1, y: p.y - 1 };
+            else if (d == dirs[2])
+                return { x: p.x + 1, y: p.y };
+            else if (d == dirs[3])
+                return { x: p.x + 1, y: p.y + 1 };
+            else if (d == dirs[4])
+                return { x: p.x, y: p.y + 1 };
+            if (d == dirs[5])
+                return { x: p.x - 1, y: p.y + 1 };
+            else if (d == dirs[6])
+                return { x: p.x - 1, y: p.y };
+            else if (d == dirs[7])
+                return { x: p.x - 1, y: p.y - 1 };
+            return null;
+        }
+
+
+        function drawline(p, q) {
+
+            context.moveTo((p.x + 1) * margin, (p.y + 1) * margin);
+            context.lineTo((q.x + 1) * margin, (q.y + 1) * margin);
+            context.strokeStyle = "#ffff00";
+            context.lineWidth = 5;
+            context.stroke();
+        }
+
+        function drawCircle(p, color, text) {
+            var xx = (p.x + 1) * margin;
+            var yy = (p.y + 1) * margin;
+
+            drawfillcircle(xx, yy, margin * 0.4, color);
+
+            var fontSize = "30";
+            var fontFace = "serif";
+            var textFillColor = "#ff0000";
+            var textBaseline = "middle";
+            var textAlign = "center";
+            var fontWeight = "normal";
+            var fontStyle = "normal";
+            context.textBaseline = textBaseline;
+            context.textAlign = textAlign;
+            context.font = fontWeight + " " + fontStyle + " " + fontSize + "px " + fontFace;
+            context.fillStyle = "#ff0000";
+            context.fillText(text, xx, yy);
+
+
+        }
+
+        function drawBackground() {
+            // draw the QIPAN
+            context.fillStyle = "#ffd77f";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            // draw LINES
+            for (var i = 1; i < canvas.height / margin; i++) {
+                context.moveTo(i * margin, margin);
+                context.lineTo(i * margin, canvas.height - margin);
+            }
+            for (var i = 1; i < canvas.height / margin; i++) {
+                context.moveTo(margin, i * margin);
+                context.lineTo(canvas.width - margin, i * margin);
+            }
+            context.strokeStyle = "#000000";
+            context.lineWidth = 2;
+            context.stroke();
+
+
+            var fontSize = "15";
+            var fontFace = "serif";
+            var textFillColor = "#ff0000";
+            var textBaseline = "middle";
+            var textAlign = "center";
+            var fontWeight = "normal";
+            var fontStyle = "normal";
+            context.textBaseline = textBaseline;
+            context.textAlign = textAlign;
+            context.font = fontWeight + " " + fontStyle + " " + fontSize + "px " + fontFace;
+            context.fillStyle = "#000000";
+            var h = new Array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O");
+            for (var i = 0; i < h.length; i++) {
+                context.fillText(h[i], (i + 1) * margin, margin / 2);
+                context.fillText(i + 1, margin / 2, (i + 1) * margin);
+
+            }
+
+            drawfillcircle(margin * 8, margin * 8, margin * 0.2, "#8f000000");
+        }
+
+        function drawfillcircle(x, y, r, color) {
+
+            context.fillStyle = color;
+            context.beginPath();
+            context.arc(x, y, parseInt(r), 0, Math.PI * 2, true);
+            context.closePath();
+            context.fill();
+        }
+
+        function showmsg() {
+            drawCircle({ x: 1, y: 1 }, "#ff0000", num);
+        }
+
+    </script>
+</body>
+</html>
