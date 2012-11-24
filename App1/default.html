@@ -1,5 +1,4 @@
-﻿// copyright @ Qidu Lin
-
+﻿<!--// copyright @ Qidu Lin-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -149,13 +148,15 @@
                     && (getseezed(q) - getseezed(p)) % 2 == 0
                     ) {
                     n[i]++;
-                    if (n[i] >= 5) { break; }
                     q = next(q, dirs[i]);
                 }
             }
             for (var i = 0; i < n.length / 2; i++) {
 
                 if (1 + n[i] + n[opp(i)] >= 5) {
+
+                    color = (1 + n[i] + n[opp(i)] >= 6) ? "#ff0000" : "#00ff00";
+
                     hideShowButtons(true);
                     var q = p;
                     for (var k = 0; k < n[i]; k++) {
@@ -210,11 +211,11 @@
         }
 
 
-        function drawline(p, q) {
+        function drawline(p, q, color) {
 
             context.moveTo((p.x + 1) * margin, (p.y + 1) * margin);
             context.lineTo((q.x + 1) * margin, (q.y + 1) * margin);
-            context.strokeStyle = "#ffff00";
+            context.strokeStyle = color;
             context.lineWidth = 5;
             context.stroke();
         }
