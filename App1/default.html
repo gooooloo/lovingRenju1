@@ -41,6 +41,7 @@
         var margin = canvas.width / 16;
         var num = 0;
 
+        function assert(b) { if (!b) { alert("assert fail!");}}
 
         function hideShowElement(id, visible) {
              document.getElementById(id).style.visibility = visible ? "visible":"hidden";
@@ -140,26 +141,38 @@
             num++;
             drawCircle(p, getCircleColor(num), num);
             setseezed(p, num);
-            var n = new Array(dirs.length);
-            for (var i = 0; i < dirs.length; i++) {
+            var endpts = new Array(dirs.length / 2);
+            for (var i = 0; i < dirs.length / 2; i++) {
+                endpts[i] = {
+                    len: 1,
+                    ep1: p,
+                    ep2: p
+                };
                 var tmq = next(p, dirs[i]);
-                n[i] = {len:0, pos:p};
                 while (getseezed(tmq) > 0
                     && (getseezed(tmq) - getseezed(p)) % 2 == 0
                     ) {
-                    n[i].len++;
-                    n[i].pos = tmq;
+                    endpts[i].len++;
+                    endpts[i].ep1 = tmq;
                     tmq = next(tmq, dirs[i]);
                 }
+                tmq = next(p, dirs[opp(i)]);
+                while (getseezed(tmq) > 0
+                    && (getseezed(tmq) - getseezed(p)) % 2 == 0
+                    ) {
+                    endpts[i].len++;
+                    endpts[i].ep2 = tmq;
+                    tmq = next(tmq, dirs[opp(i)]);
+                }
             }
+            
+            for (var i = 0; i < endpts.length; i++) {
+                if (endpts[i].len >= 5) {
 
-            for (var i = 0; i < n.length / 2; i++) {
-                if (1 + n[i].len + n[opp(i)].len >= 5) {
-
-                    color = (1 + n[i].len + n[opp(i)].len >= 6) ? "#ff0000" : "#00ff00";
+                    color = (endpts[i].len >= 6) ? "#ff0000" : "#00ff00";
 
                     hideShowButtons(true);
-                    drawline(n[i].pos, n[opp(i)].pos, color);
+                    drawline(endpts[i].ep1, endpts[i].ep2, color);
                 }
             }
 
