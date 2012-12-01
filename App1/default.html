@@ -162,12 +162,12 @@
                     for (var k = 0; k < n[i]; k++) {
                         q = next(q, dirs[i]);
                     }
-                    drawline(p, q);
+                    drawline(p, q, color);
                     q = p;
                     for (var k = 0; k < n[opp(i)]; k++) {
                         q = next(q, dirs[opp(i)]);
                     }
-                    drawline(p, q);
+                    drawline(p, q, color);
                 }
             }
 
@@ -212,12 +212,13 @@
 
 
         function drawline(p, q, color) {
-
+            context.beginPath();
             context.moveTo((p.x + 1) * margin, (p.y + 1) * margin);
             context.lineTo((q.x + 1) * margin, (q.y + 1) * margin);
             context.strokeStyle = color;
             context.lineWidth = 5;
             context.stroke();
+            context.closePath();
         }
 
         function drawCircle(p, color, text) {
@@ -247,6 +248,7 @@
             context.fillStyle = "#ffd77f";
             context.fillRect(0, 0, canvas.width, canvas.height);
 
+            context.beginPath();
             // draw LINES
             for (var i = 1; i < canvas.height / margin; i++) {
                 context.moveTo(i * margin, margin);
@@ -259,6 +261,7 @@
             context.strokeStyle = "#000000";
             context.lineWidth = 2;
             context.stroke();
+            context.closePath();
 
 
             var fontSize = "15";
@@ -284,11 +287,11 @@
 
         function drawfillcircle(x, y, r, color) {
 
-            context.fillStyle = color;
             context.beginPath();
+            context.fillStyle = color;
             context.arc(x, y, parseInt(r), 0, Math.PI * 2, true);
-            context.closePath();
             context.fill();
+            context.closePath();
         }
 
         function showmsg() {
