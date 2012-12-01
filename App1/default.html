@@ -148,6 +148,11 @@
                     ep1: p,
                     ep2: p
                 };
+
+                // TODO: 
+                // 1. if it is not a live four, then igore it.
+                // 2. if it is not a live three, then igore it.
+                // 3. jump live four, jump live three
                 var tmq = next(p, dirs[i]);
                 while (getseezed(tmq) > 0
                     && (getseezed(tmq) - getseezed(p)) % 2 == 0
@@ -165,11 +170,25 @@
                     tmq = next(tmq, dirs[opp(i)]);
                 }
             }
-            
-            for (var i = 0; i < endpts.length; i++) {
-                if (endpts[i].len >= 5) {
 
-                    color = (endpts[i].len >= 6) ? "#ff0000" : "#00ff00";
+            var numOfFour = 0;
+            var numOfThree = 0;
+
+            for (var i = 0; i < endpts.length; i++) {
+                switch (endpts[i].len) {
+                    case 4: numOfFour++; break;
+                    case 3: numOfThree++; break;
+                    default: // we don't care this.
+                }
+            }
+
+
+            for (var i = 0; i < endpts.length; i++) {
+                
+                if ((endpts[i].len > 4)
+                    || ((numOfFour > 1) && endpts[i].len == 4)
+                    || ((numOfThree > 1) && (endpts[i].len == 3))) {
+                    color = (endpts[i].len == 5) ? "#00ff00" : "#ff0000";
 
                     hideShowButtons(true);
                     drawline(endpts[i].ep1, endpts[i].ep2, color);
