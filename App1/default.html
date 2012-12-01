@@ -184,11 +184,18 @@
 
 
             for (var i = 0; i < endpts.length; i++) {
-                
-                if ((endpts[i].len > 4)
+
+                var success = (endpts[i].len == 5);
+
+                // only black side has JINSHOU limitation.
+                if (num % 2 == 1) {
+                    var jinshou = (endpts[i].len > 5)
                     || ((numOfFour > 1) && endpts[i].len == 4)
-                    || ((numOfThree > 1) && (endpts[i].len == 3))) {
-                    color = (endpts[i].len == 5) ? "#00ff00" : "#ff0000";
+                    || ((numOfThree > 1) && (endpts[i].len == 3));
+                }
+                
+                if (success || jinshou) {
+                    color = (success) ? "#00ff00" : "#ff0000";
 
                     hideShowButtons(true);
                     drawline(endpts[i].ep1, endpts[i].ep2, color);
