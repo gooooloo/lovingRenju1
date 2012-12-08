@@ -143,12 +143,14 @@
                 ) {
                 ret.len++;
                 ret.ep = tmq;
-                ret.possbileLen++;
                 tmq = next(tmq, dirs[dirIdx]);
             }
             // TODO:this is for computing possibleLen, however, this kind of transverse is of low efficiency. 
             // Consider to maintain a possible len matrix from begining, and update it when a click happens.
-            while (valid(tmq) && getseezed(tmq) == 0) {
+            tmq = next(p, dirs[dirIdx]);
+            while (true) {
+                if (!valid(tmq)) { break; }
+                if (getseezed(tmq) > 0 && ((getseezed(tmq) - getseezed(p)) % 2 != 0)) { break; }
                 ret.possbileLen++;
                 tmq = next(tmq, dirs[dirIdx]);
             }
@@ -175,13 +177,17 @@
                     // then it is dead. No need to check any more. Mark as -1.
                     endpts[i].len = -1;
                 } else if (epdetect1.jump && epdetect2.jump) {
-                    // TODO: complex. 2 jumps totla, should count as no jump.
+                    // TODO: complex. 2 jumps in total, should count as no jump.
                 } else if (!epdetect1.jump && !epdetect2.jump) {
 
                     endpts[i].len = 1 + epdetect1.len + epdetect2.len;
                     endpts[i].ep1 = epdetect1.ep;
                     endpts[i].ep2 = epdetect2.ep;
                 } else {
+                    assert(epdetect1.jump || epdetect2.jump);
+                    endpts[i].len = (1 + epdetect1.len + epdetect2.len) - 1; // we shouldnt count the jumping blank
+                    endpts[i].ep1 = epdetect1.ep;
+                    endpts[i].ep2 = epdetect2.ep;
                     // TODO: complex. be careful with ****#* type.
                 }
 
