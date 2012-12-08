@@ -135,17 +135,51 @@
             return 0 <= p.x && p.x < 15 && 0 <= p.y && p.y < 15;
         }
 
+        function sameSide(p, q) {
+            return (getseezed(p) > 0)
+            && (getseezed(q) > 0)
+            && ((getseezed(q) - getseezed(p)) % 2 == 0);
+        }
+
+        function differentSideS(p, q) {
+            return (getseezed(p) > 0)
+            && (getseezed(q) > 0)
+            && ((getseezed(q) - getseezed(p)) % 2 != 0);
+        }
+
+        function emptySide(p){
+            return getseezed(p) == 0;
+        }
         function detectEndPoint(p, dirIdx) {
             var ret = { len: 0, ep: p, possbileLen: 0, jump: false };
             var tmq = next(p, dirs[dirIdx]);
-            while (getseezed(tmq) > 0
-                && (getseezed(tmq) - getseezed(p)) % 2 == 0
-                ) {
-                ret.len++;
-                ret.ep = tmq;
+            var hasEmpty = false;
+            var delayedLength = 0;
+            while (sameSide(p, tmq) || emptySide(tmq)) {
+                if (emptySide(tmq)) {
+                    if (hasEmpty) {
+                        // we dont care more than 1 blank in one direction.
+                        break;
+                    } else {
+                        hasEmpty = true;
+                        delayedLength++;
+                    }
+                } else {
+                    if (delayedLength > 0) {
+                        ret.jump = true;
+                        ret.len += delayedLength;
+                        delayedLength = 0;
+                    }
+                    ret.len++;
+                    delayedLength = 0;
+                    ret.ep = tmq;
+                }
+
                 tmq = next(tmq, dirs[dirIdx]);
             }
-            // TODO:this is for computing possibleLen, however, this kind of transverse is of low efficiency. 
+
+            // compute possible lenght.
+            // TODO: this kind of transverse is of low efficiency. 
             // Consider to maintain a possible len matrix from begining, and update it when a click happens.
             tmq = next(p, dirs[dirIdx]);
             while (true) {
@@ -167,7 +201,8 @@
                 endpts[i] = {
                     len: 1,
                     ep1: p,
-                    ep2: p
+                    ep2: p,
+                    jump: false,
                 };
 
                 var epdetect1 = detectEndPoint(p, i);
@@ -188,6 +223,7 @@
                     endpts[i].len = (1 + epdetect1.len + epdetect2.len) - 1; // we shouldnt count the jumping blank
                     endpts[i].ep1 = epdetect1.ep;
                     endpts[i].ep2 = epdetect2.ep;
+                    endpts[i].jump = true;
                     // TODO: complex. be careful with ****#* type.
                 }
 
@@ -215,7 +251,8 @@
                 // only black side has JINSHOU limitation.
                 var hasJinshouLimit = (num % 2 == 1);
 
-                var success = hasJinshouLimit ? (endpts[i].len == 5) : (endpts[i].len >= 5);
+                var success = (!endpts[i].jump)
+                    && (hasJinshouLimit ? (endpts[i].len == 5) : (endpts[i].len >= 5));
 
                 var jinshou = false;
                 if (hasJinshouLimit) {
