@@ -41,10 +41,10 @@
         var margin = canvas.width / 16;
         var num = 0;
 
-        function assert(b) { if (!b) { alert("assert fail!");}}
+        function assert(b) { if (!b) { alert("assert fail!"); } }
 
         function hideShowElement(id, visible) {
-             document.getElementById(id).style.visibility = visible ? "visible":"hidden";
+            document.getElementById(id).style.visibility = visible ? "visible" : "hidden";
 
             //document.getElementById(id).style.display = visible ? "inline" : "none";
         }
@@ -135,6 +135,25 @@
             return 0 <= p.x && p.x < 15 && 0 <= p.y && p.y < 15;
         }
 
+        function detectEndPoint(p, dirIdx) {
+            var ret = { len: 0, ep: p, possbileLen: 0, jump: false };
+            var tmq = next(p, dirs[dirIdx]);
+            while (getseezed(tmq) > 0
+                && (getseezed(tmq) - getseezed(p)) % 2 == 0
+                ) {
+                ret.len++;
+                ret.ep = tmq;
+                ret.possbileLen++;
+                tmq = next(tmq, dirs[dirIdx]);
+            }
+            // TODO:this is for computing possibleLen, however, this kind of transverse is of low efficiency. 
+            // Consider to maintain a possible len matrix from begining, and update it when a click happens.
+            while (valid(tmq) && getseezed(tmq) == 0) {
+                ret.possbileLen++;
+                tmq = next(tmq, dirs[dirIdx]);
+            }
+            return ret;
+        }
         function play(p) {
             hideShowButtons(false);
             steps.push(p);
@@ -149,26 +168,29 @@
                     ep2: p
                 };
 
+                var epdetect1 = detectEndPoint(p, i);
+                var epdetect2 = detectEndPoint(p, opp(i));
+
+                if (epdetect1.possbileLen + epdetect2.possbileLen + 1 < 5) {
+                    // then it is dead. No need to check any more. Mark as -1.
+                    endpts[i].len = -1;
+                } else if (epdetect1.jump && epdetect2.jump) {
+                    // TODO: complex. 2 jumps totla, should count as no jump.
+                } else if (!epdetect1.jump && !epdetect2.jump) {
+
+                    endpts[i].len = 1 + epdetect1.len + epdetect2.len;
+                    endpts[i].ep1 = epdetect1.ep;
+                    endpts[i].ep2 = epdetect2.ep;
+                } else {
+                    // TODO: complex. be careful with ****#* type.
+                }
+
+
                 // TODO: 
                 // 1. if it is not a live four, then igore it.
                 // 2. if it is not a live three, then igore it.
                 // 3. jump live four, jump live three
-                var tmq = next(p, dirs[i]);
-                while (getseezed(tmq) > 0
-                    && (getseezed(tmq) - getseezed(p)) % 2 == 0
-                    ) {
-                    endpts[i].len++;
-                    endpts[i].ep1 = tmq;
-                    tmq = next(tmq, dirs[i]);
-                }
-                tmq = next(p, dirs[opp(i)]);
-                while (getseezed(tmq) > 0
-                    && (getseezed(tmq) - getseezed(p)) % 2 == 0
-                    ) {
-                    endpts[i].len++;
-                    endpts[i].ep2 = tmq;
-                    tmq = next(tmq, dirs[opp(i)]);
-                }
+
             }
 
             var numOfFour = 0;
@@ -184,16 +206,18 @@
 
 
             for (var i = 0; i < endpts.length; i++) {
-
-                var success = (endpts[i].len == 5);
-
                 // only black side has JINSHOU limitation.
-                if (num % 2 == 1) {
-                    var jinshou = (endpts[i].len > 5)
+                var hasJinshouLimit = (num % 2 == 1);
+
+                var success = hasJinshouLimit ? (endpts[i].len == 5) : (endpts[i].len >= 5);
+
+                var jinshou = false;
+                if (hasJinshouLimit) {
+                    jinshou = (endpts[i].len > 5)
                     || ((numOfFour > 1) && endpts[i].len == 4)
                     || ((numOfThree > 1) && (endpts[i].len == 3));
                 }
-                
+
                 if (success || jinshou) {
                     color = (success) ? "#00ff00" : "#ff0000";
 
