@@ -78,6 +78,11 @@
         DataManager.prototype.emptySide = function (p) {
             return dataManager.getSeezed(p) == 0;
         }
+        DataManager.prototype.resetData = function () {
+            dataManager.resetSeezed();
+            dataManager.num = 0;
+            dataManager.resetSteps();
+        }
 
         PlayManager.dirs = new Array(1, 2, 3, 4, 5, 6, 7, 8);
         PlayManager.playsaved = function (steps) {
@@ -379,9 +384,7 @@
         }
 
         function initgame() {
-            dataManager.resetSeezed();
-            dataManager.num = 0;
-            dataManager.resetSteps();
+            dataManager.resetData();
             UIDrawer.drawbackground();
 
         }
