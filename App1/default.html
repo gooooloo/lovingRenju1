@@ -31,6 +31,16 @@
         }
         var UIDrawer = function () { }
         var PlayManager = function () { }
+        var ResultManager = function () { }
+
+        ResultManager.onJinshou = function (p1, p2) {
+            hideShowButtons(true);
+            UIDrawer.drawline(p1, p2, UIDrawer.getJinshouLineColor());
+        }
+        ResultManager.onSuccess = function (p1, p2) {
+            hideShowButtons(true);
+            UIDrawer.drawline(p1, p2, UIDrawer.getSuccessfulLineColor());
+        }
 
         DataManager.prototype.num = 0;
         DataManager.prototype.getSeezed = function (p) {
@@ -156,13 +166,10 @@
                 }
 
                 if (success) {
-
-                    hideShowButtons(true);
-                    UIDrawer.drawline(endpts[i].ep1, endpts[i].ep2, UIDrawer.getSuccessfulLineColor());
+                    ResultManager.onSuccess(endpts[i].ep1, endpts[i].ep2);
                 }
                 if (jinshou) {
-                    hideShowButtons(true);
-                    UIDrawer.drawline(endpts[i].ep1, endpts[i].ep2, UIDrawer.getJinshouLineColor());
+                    ResultManager.onJinshou(endpts[i].ep1, endpts[i].ep2);
                 }
             }
         }
