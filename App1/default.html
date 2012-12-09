@@ -59,6 +59,10 @@
             return this.steps;
         }
 
+
+        UIDrawer.prototype.getIndex = function(x) {
+            return parseInt(x / margin + 0.5) - 1;
+        }
         UIDrawer.prototype.drawfillcircle = function(x, y, r, color) {
 
                 context.beginPath();
@@ -230,7 +234,7 @@
         }
 
         function onclick(e) {
-            var p = { x: getIndex(e.offsetX), y: getIndex(e.offsetY) };
+            var p = { x: uiDrawer.getIndex(e.offsetX), y: uiDrawer.getIndex(e.offsetY) };
             if (!valid(p)) {
                 return;
             }
@@ -394,9 +398,6 @@
             return dataManager.getSeezed(p);
         }
 
-        function getIndex(x) {
-            return parseInt(x / margin + 0.5) - 1;
-        }
         function next(p, d) {
             // TODO: boundary condition checking
             if (d == dirs[0])
