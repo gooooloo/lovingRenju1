@@ -230,7 +230,7 @@
         }
 
         function onclick(e) {
-            var p = { x: myi(e.offsetX), y: myi(e.offsetY) };
+            var p = { x: getIndex(e.offsetX), y: getIndex(e.offsetY) };
             if (!valid(p)) {
                 return;
             }
@@ -394,7 +394,7 @@
             return dataManager.getSeezed(p);
         }
 
-        function myi(x) {
+        function getIndex(x) {
             return parseInt(x / margin + 0.5) - 1;
         }
         function next(p, d) {
