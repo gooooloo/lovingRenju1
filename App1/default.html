@@ -126,8 +126,15 @@
             context.font = fontWeight + " " + fontStyle + " " + fontSize + "px " + fontFace;
             context.fillStyle = "#ff0000";
             context.fillText(text, xx, yy);
-
-
+        }
+        UIDrawer.prototype.drawline = function(p, q, color) {
+            context.beginPath();
+            context.moveTo((p.x + 1) * margin, (p.y + 1) * margin);
+            context.lineTo((q.x + 1) * margin, (q.y + 1) * margin);
+            context.strokeStyle = color;
+            context.lineWidth = 5;
+            context.stroke();
+            context.closePath();
         }
 
         var dataManager = new DataManager();
@@ -368,7 +375,7 @@
                     color = (success) ? "#00ff00" : "#ff0000";
 
                     hideShowButtons(true);
-                    drawline(endpts[i].ep1, endpts[i].ep2, color);
+                    uiDrawer.drawline(endpts[i].ep1, endpts[i].ep2, color);
                 }
             }
 
@@ -411,16 +418,6 @@
             return null;
         }
 
-
-        function drawline(p, q, color) {
-            context.beginPath();
-            context.moveTo((p.x + 1) * margin, (p.y + 1) * margin);
-            context.lineTo((q.x + 1) * margin, (q.y + 1) * margin);
-            context.strokeStyle = color;
-            context.lineWidth = 5;
-            context.stroke();
-            context.closePath();
-        }
         
     </script>
 </body>
