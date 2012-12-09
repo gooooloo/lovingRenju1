@@ -38,6 +38,7 @@
         var UIDrawer = function () { }
         var PlayManager = function () { }
 
+        DataManager.prototype.num = 0;
         DataManager.prototype.getSeezed = function (p) {
             return this.myseezed[p.x * 15 + p.y];
         }
@@ -84,9 +85,9 @@
         PlayManager.play = function (p) {
             hideShowButtons(false);
             dataManager.addStep(p);
-            num++;
-            UIDrawer.drawCircle(p, getCircleColor(num), num);
-            dataManager.setSeezed(p, num);
+            dataManager.num++;
+            UIDrawer.drawCircle(p, getCircleColor(dataManager.num), dataManager.num);
+            dataManager.setSeezed(p, dataManager.num);
             var endpts = new Array(PlayManager.dirs.length / 2);
             for (var i = 0; i < PlayManager.dirs.length / 2; i++) {
                 endpts[i] = {
@@ -137,7 +138,7 @@
 
             for (var i = 0; i < endpts.length; i++) {
                 // only black side has JINSHOU limitation.
-                var hasJinshouLimit = (num % 2 == 1);
+                var hasJinshouLimit = (dataManager.num % 2 == 1);
 
                 var success = (!endpts[i].jump)
                     && (hasJinshouLimit ? (endpts[i].len == 5) : (endpts[i].len >= 5));
@@ -222,7 +223,7 @@
         }
 
         UIDrawer.getIndex = function (x) {
-            return parseInt(x / margin + 0.5) - 1;
+            return parseInt(x / UIDrawer.margin + 0.5) - 1;
         }
         UIDrawer.drawfillcircle = function (x, y, r, color) {
 
@@ -239,13 +240,13 @@
 
             context.beginPath();
             // draw LINES
-            for (var i = 1; i < canvas.height / margin; i++) {
-                context.moveTo(i * margin, margin);
-                context.lineTo(i * margin, canvas.height - margin);
+            for (var i = 1; i < canvas.height / UIDrawer.margin; i++) {
+                context.moveTo(i * UIDrawer.margin, UIDrawer.margin);
+                context.lineTo(i * UIDrawer.margin, canvas.height - UIDrawer.margin);
             }
-            for (var i = 1; i < canvas.height / margin; i++) {
-                context.moveTo(margin, i * margin);
-                context.lineTo(canvas.width - margin, i * margin);
+            for (var i = 1; i < canvas.height / UIDrawer.margin; i++) {
+                context.moveTo(UIDrawer.margin, i * UIDrawer.margin);
+                context.lineTo(canvas.width - UIDrawer.margin, i * UIDrawer.margin);
             }
             context.strokeStyle = "#000000";
             context.lineWidth = 2;
@@ -266,18 +267,18 @@
             context.fillStyle = "#000000";
             var h = new Array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O");
             for (var i = 0; i < h.length; i++) {
-                context.fillText(h[i], (i + 1) * margin, margin / 2);
-                context.fillText(i + 1, margin / 2, (i + 1) * margin);
+                context.fillText(h[i], (i + 1) * UIDrawer.margin, UIDrawer.margin / 2);
+                context.fillText(i + 1, UIDrawer.margin / 2, (i + 1) * UIDrawer.margin);
 
             }
 
-            this.drawfillcircle(margin * 8, margin * 8, margin * 0.2, "#8f000000");
+            this.drawfillcircle(UIDrawer.margin * 8, UIDrawer.margin * 8, UIDrawer.margin * 0.2, "#8f000000");
         }
         UIDrawer.drawCircle = function (p, color, text) {
-            var xx = (p.x + 1) * margin;
-            var yy = (p.y + 1) * margin;
+            var xx = (p.x + 1) * UIDrawer.margin;
+            var yy = (p.y + 1) * UIDrawer.margin;
 
-            this.drawfillcircle(xx, yy, margin * 0.4, color);
+            this.drawfillcircle(xx, yy, UIDrawer.margin * 0.4, color);
 
             var fontSize = "30";
             var fontFace = "serif";
@@ -294,8 +295,8 @@
         }
         UIDrawer.drawline = function (p, q, color) {
             context.beginPath();
-            context.moveTo((p.x + 1) * margin, (p.y + 1) * margin);
-            context.lineTo((q.x + 1) * margin, (q.y + 1) * margin);
+            context.moveTo((p.x + 1) * UIDrawer.margin, (p.y + 1) * UIDrawer.margin);
+            context.lineTo((q.x + 1) * UIDrawer.margin, (q.y + 1) * UIDrawer.margin);
             context.strokeStyle = color;
             context.lineWidth = 5;
             context.stroke();
@@ -303,7 +304,6 @@
         }
 
         var dataManager = new DataManager();
-        var playManager = new PlayManager();
 
 
 
@@ -312,8 +312,7 @@
         canvas.height = canvas.width;
         canvas.style.position = "fix"
         var context = canvas.getContext("2d");
-        var margin = canvas.width / 16;
-        var num = 0;
+        UIDrawer.margin = canvas.width / 16;
 
         function assert(b) { if (!b) { alert("assert fail!"); } }
 
@@ -375,7 +374,7 @@
 
         function initgame() {
             dataManager.resetSeezed();
-            num = 0;
+            dataManager.num = 0;
             dataManager.resetSteps();
             UIDrawer.drawbackground();
 
