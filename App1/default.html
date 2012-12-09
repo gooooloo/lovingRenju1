@@ -30,9 +30,31 @@
     </div>
 
     <script>
+
+        var DataManager = function () { this.myseezed = new Array(15 * 15); }
+        var UIDrawer = function () { }
+        var PlayManager = function () { }
+        
+        DataManager.prototype.getSeezed = function (p) {
+            return this.myseezed[p.x * 15 + p.y];
+        }
+        DataManager.prototype.setSeezed = function (p, num) {
+            this.myseezed[p.x * 15 + p.y] = num;
+        }
+        DataManager.prototype.resetSeezed = function () {
+            for (var i = 0; i < this.myseezed.length; i++) {
+                this.myseezed[i] = 0;
+            }
+        }
+
+        var dataManager = new DataManager();
+        var uiDrawer = new UIDrawer();
+        var playManager = new PlayManager();
+
+
+
         var steps = new Array();
         var dirs = new Array(1, 2, 3, 4, 5, 6, 7, 8);
-        var seezed = new Array(15 * 15);
         var canvas = document.getElementById("canvas");
         canvas.width = ccc - 30;
         canvas.height = canvas.width;
@@ -106,9 +128,7 @@
         }
 
         function initgame() {
-            for (var i = 0; i < seezed.length; i++) {
-                seezed[i] = 0;
-            }
+            dataManager.resetSeezed();
             num = 0;
             steps = new Array();
             drawBackground();
@@ -277,11 +297,11 @@
 
 
         function setseezed(p, n) {
-            seezed[p.x * 15 + p.y] = n;
+            dataManager.setSeezed(p, n);
         }
 
         function getseezed(p) {
-            return seezed[p.x * 15 + p.y];
+            return dataManager.getSeezed(p);
         }
 
         function myi(x) {
