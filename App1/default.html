@@ -60,10 +60,10 @@
         }
 
 
-        UIDrawer.prototype.getIndex = function(x) {
+        UIDrawer.getIndex = function(x) {
             return parseInt(x / margin + 0.5) - 1;
         }
-        UIDrawer.prototype.drawfillcircle = function(x, y, r, color) {
+        UIDrawer.drawfillcircle = function(x, y, r, color) {
 
                 context.beginPath();
                 context.fillStyle = color;
@@ -71,7 +71,7 @@
                 context.fill();
                 context.closePath();
         }
-        UIDrawer.prototype.drawbackground = function () {
+        UIDrawer.drawbackground = function () {
             // draw the QIPAN
             context.fillStyle = "#ffd77f";
             context.fillRect(0, 0, canvas.width, canvas.height);
@@ -112,7 +112,7 @@
 
             this.drawfillcircle(margin * 8, margin * 8, margin * 0.2, "#8f000000");
         }
-        UIDrawer.prototype.drawCircle = function(p, color, text) {
+        UIDrawer.drawCircle = function(p, color, text) {
             var xx = (p.x + 1) * margin;
             var yy = (p.y + 1) * margin;
 
@@ -131,7 +131,7 @@
             context.fillStyle = "#ff0000";
             context.fillText(text, xx, yy);
         }
-        UIDrawer.prototype.drawline = function(p, q, color) {
+        UIDrawer.drawline = function(p, q, color) {
             context.beginPath();
             context.moveTo((p.x + 1) * margin, (p.y + 1) * margin);
             context.lineTo((q.x + 1) * margin, (q.y + 1) * margin);
@@ -142,7 +142,6 @@
         }
 
         var dataManager = new DataManager();
-        var uiDrawer = new UIDrawer();
         var playManager = new PlayManager();
 
 
@@ -224,7 +223,7 @@
             dataManager.resetSeezed();
             num = 0;
             dataManager.resetSteps();
-            uiDrawer.drawbackground();
+            UIDrawer.drawbackground();
 
         }
 
@@ -234,7 +233,7 @@
         }
 
         function onclick(e) {
-            var p = { x: uiDrawer.getIndex(e.offsetX), y: uiDrawer.getIndex(e.offsetY) };
+            var p = { x: UIDrawer.getIndex(e.offsetX), y: UIDrawer.getIndex(e.offsetY) };
             if (!valid(p)) {
                 return;
             }
@@ -308,7 +307,7 @@
             hideShowButtons(false);
             dataManager.addStep(p);
             num++;
-            uiDrawer.drawCircle(p, getCircleColor(num), num);
+            UIDrawer.drawCircle(p, getCircleColor(num), num);
             setseezed(p, num);
             var endpts = new Array(dirs.length / 2);
             for (var i = 0; i < dirs.length / 2; i++) {
@@ -379,7 +378,7 @@
                     color = (success) ? "#00ff00" : "#ff0000";
 
                     hideShowButtons(true);
-                    uiDrawer.drawline(endpts[i].ep1, endpts[i].ep2, color);
+                    UIDrawer.drawline(endpts[i].ep1, endpts[i].ep2, color);
                 }
             }
 
