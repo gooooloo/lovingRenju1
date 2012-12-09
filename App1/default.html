@@ -155,11 +155,14 @@
                     || ((numOfThree > 1) && (endpts[i].len == 3));
                 }
 
-                if (success || jinshou) {
-                    color = (success) ? "#00ff00" : "#ff0000";
+                if (success) {
 
                     hideShowButtons(true);
-                    UIDrawer.drawline(endpts[i].ep1, endpts[i].ep2, color);
+                    UIDrawer.drawline(endpts[i].ep1, endpts[i].ep2, UIDrawer.getSuccessfulLineColor());
+                }
+                if (jinshou) {
+                    hideShowButtons(true);
+                    UIDrawer.drawline(endpts[i].ep1, endpts[i].ep2, UIDrawer.getJinshouLineColor());
                 }
             }
         }
@@ -227,6 +230,12 @@
             return ret;
         }
 
+        UIDrawer.getSuccessfulLineColor = function () {
+            return "#00ff00";
+        }
+        UIDrawer.getJinshouLineColor = function () {
+            return "#ff0000"
+        }
         UIDrawer.getCircleColor = function (isBlackSide) {
             return isBlackSide ? "#000000" : "#ffffff";
         }
@@ -312,7 +321,7 @@
         }
 
         var dataManager = new DataManager();
-        
+
         var canvas = document.getElementById("canvas");
         var context = canvas.getContext("2d");
 
