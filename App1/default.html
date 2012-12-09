@@ -58,6 +58,22 @@
         DataManager.prototype.getSteps = function () {
             return this.steps;
         }
+        DataManager.prototype.valid = function (p) {
+            return 0 <= p.x && p.x < 15 && 0 <= p.y && p.y < 15;
+        }
+        DataManager.prototype.sameSide = function (p, q) {
+            return (dataManager.getSeezed(p) > 0)
+            && (dataManager.getSeezed(q) > 0)
+            && ((dataManager.getSeezed(q) - dataManager.getSeezed(p)) % 2 == 0);
+        }
+        DataManager.prototype.differentSideS = function (p, q) {
+            return (dataManager.getSeezed(p) > 0)
+            && (dataManager.getSeezed(q) > 0)
+            && ((dataManager.getSeezed(q) - dataManager.getSeezed(p)) % 2 != 0);
+        }
+        DataManager.prototype.emptySide = function (p) {
+            return dataManager.getSeezed(p) == 0;
+        }
 
 
         UIDrawer.getIndex = function(x) {
@@ -234,42 +250,22 @@
 
         function onclick(e) {
             var p = { x: UIDrawer.getIndex(e.offsetX), y: UIDrawer.getIndex(e.offsetY) };
-            if (!valid(p)) {
+            if (!dataManager.valid(p)) {
                 return;
             }
-            if (getseezed(p) > 0) {
+            if (dataManager.getSeezed(p) > 0) {
                 // already seezed, just return.
                 return;
             }
             play(p);
-        }
-
-        function valid(p) {
-            return 0 <= p.x && p.x < 15 && 0 <= p.y && p.y < 15;
-        }
-
-        function sameSide(p, q) {
-            return (getseezed(p) > 0)
-            && (getseezed(q) > 0)
-            && ((getseezed(q) - getseezed(p)) % 2 == 0);
-        }
-
-        function differentSideS(p, q) {
-            return (getseezed(p) > 0)
-            && (getseezed(q) > 0)
-            && ((getseezed(q) - getseezed(p)) % 2 != 0);
-        }
-
-        function emptySide(p){
-            return getseezed(p) == 0;
         }
         function detectEndPoint(p, dirIdx) {
             var ret = { len: 0, ep: p, possbileLen: 0, jump: false };
             var tmq = next(p, dirs[dirIdx]);
             var hasEmpty = false;
             var delayedLength = 0;
-            while (sameSide(p, tmq) || emptySide(tmq)) {
-                if (emptySide(tmq)) {
+            while (dataManager.sameSide(p, tmq) || dataManager.emptySide(tmq)) {
+                if (dataManager.emptySide(tmq)) {
                     if (hasEmpty) {
                         // we dont care more than 1 blank in one direction.
                         break;
@@ -296,8 +292,8 @@
             // Consider to maintain a possible len matrix from begining, and update it when a click happens.
             tmq = next(p, dirs[dirIdx]);
             while (true) {
-                if (!valid(tmq)) { break; }
-                if (getseezed(tmq) > 0 && ((getseezed(tmq) - getseezed(p)) % 2 != 0)) { break; }
+                if (!dataManager.valid(tmq)) { break; }
+                if (dataManager.getSeezed(tmq) > 0 && ((dataManager.getSeezed(tmq) - dataManager.getSeezed(p)) % 2 != 0)) { break; }
                 ret.possbileLen++;
                 tmq = next(tmq, dirs[dirIdx]);
             }
@@ -308,7 +304,7 @@
             dataManager.addStep(p);
             num++;
             UIDrawer.drawCircle(p, getCircleColor(num), num);
-            setseezed(p, num);
+            dataManager.setSeezed(p, num);
             var endpts = new Array(dirs.length / 2);
             for (var i = 0; i < dirs.length / 2; i++) {
                 endpts[i] = {
@@ -387,16 +383,7 @@
         function opp(i) {
             return (i + dirs.length / 2) % dirs.length;
         }
-
-
-        function setseezed(p, n) {
-            dataManager.setSeezed(p, n);
-        }
-
-        function getseezed(p) {
-            return dataManager.getSeezed(p);
-        }
-
+        
         function next(p, d) {
             // TODO: boundary condition checking
             if (d == dirs[0])
