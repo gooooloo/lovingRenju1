@@ -76,7 +76,88 @@
         }
 
         PlayManager.dirs = new Array(1, 2, 3, 4, 5, 6, 7, 8);
-        PlayManager.next = function(p, d) {
+        PlayManager.playsaved = function (steps) {
+            for (var i = 0; i < steps.length; i++) {
+                PlayManager.play(steps[i]);
+            }
+        }
+        PlayManager.play = function (p) {
+            hideShowButtons(false);
+            dataManager.addStep(p);
+            num++;
+            UIDrawer.drawCircle(p, getCircleColor(num), num);
+            dataManager.setSeezed(p, num);
+            var endpts = new Array(PlayManager.dirs.length / 2);
+            for (var i = 0; i < PlayManager.dirs.length / 2; i++) {
+                endpts[i] = {
+                    len: 1,
+                    ep1: p,
+                    ep2: p,
+                    jump: false,
+                };
+
+                var epdetect1 = PlayManager.detectEndPoint(p, i);
+                var epdetect2 = PlayManager.detectEndPoint(p, PlayManager.opp(i));
+
+                if (epdetect1.possbileLen + epdetect2.possbileLen + 1 < 5) {
+                    // then it is dead. No need to check any more. Mark as -1.
+                    endpts[i].len = -1;
+                } else if (epdetect1.jump && epdetect2.jump) {
+                    // TODO: complex. 2 jumps in total, should count as no jump.
+                } else if (!epdetect1.jump && !epdetect2.jump) {
+
+                    endpts[i].len = 1 + epdetect1.len + epdetect2.len;
+                    endpts[i].ep1 = epdetect1.ep;
+                    endpts[i].ep2 = epdetect2.ep;
+                } else {
+                    assert(epdetect1.jump || epdetect2.jump);
+                    endpts[i].len = (1 + epdetect1.len + epdetect2.len) - 1; // we shouldnt count the jumping blank
+                    endpts[i].ep1 = epdetect1.ep;
+                    endpts[i].ep2 = epdetect2.ep;
+                    endpts[i].jump = true;
+                    // TODO: complex. be careful with ****#* type.
+                }
+
+                // TODO: 
+                // 1. if it is not a live four, then igore it.
+                // 2. if it is not a live three, then igore it.
+                // 3. jump live four, jump live three
+            }
+
+            var numOfFour = 0;
+            var numOfThree = 0;
+
+            for (var i = 0; i < endpts.length; i++) {
+                switch (endpts[i].len) {
+                    case 4: numOfFour++; break;
+                    case 3: numOfThree++; break;
+                    default: // we don't care this.
+                }
+            }
+
+            for (var i = 0; i < endpts.length; i++) {
+                // only black side has JINSHOU limitation.
+                var hasJinshouLimit = (num % 2 == 1);
+
+                var success = (!endpts[i].jump)
+                    && (hasJinshouLimit ? (endpts[i].len == 5) : (endpts[i].len >= 5));
+
+                var jinshou = false;
+                if (hasJinshouLimit) {
+                    jinshou = (endpts[i].len > 5)
+                    || ((numOfFour > 1) && endpts[i].len == 4)
+                    || ((numOfThree > 1) && (endpts[i].len == 3));
+                }
+
+                if (success || jinshou) {
+                    color = (success) ? "#00ff00" : "#ff0000";
+
+                    hideShowButtons(true);
+                    UIDrawer.drawline(endpts[i].ep1, endpts[i].ep2, color);
+                }
+            }
+        }
+        PlayManager.next = function (p, d) {
             // TODO: boundary condition checking
             if (d == PlayManager.dirs[0])
                 return { x: p.x, y: p.y - 1 };
@@ -285,12 +366,6 @@
 
         }
 
-        function playsaved(steps) {
-
-            for (var i = 0; i < steps.length; i++) {
-                play(steps[i]);
-            }
-        }
 
 
         function onresetall(e) {
@@ -320,87 +395,7 @@
                 // already seezed, just return.
                 return;
             }
-            play(p);
-        }
-        function play(p) {
-            hideShowButtons(false);
-            dataManager.addStep(p);
-            num++;
-            UIDrawer.drawCircle(p, getCircleColor(num), num);
-            dataManager.setSeezed(p, num);
-            var endpts = new Array(PlayManager.dirs.length / 2);
-            for (var i = 0; i < PlayManager.dirs.length / 2; i++) {
-                endpts[i] = {
-                    len: 1,
-                    ep1: p,
-                    ep2: p,
-                    jump: false,
-                };
-
-                var epdetect1 = PlayManager.detectEndPoint(p, i);
-                var epdetect2 = PlayManager.detectEndPoint(p, PlayManager.opp(i));
-
-                if (epdetect1.possbileLen + epdetect2.possbileLen + 1 < 5) {
-                    // then it is dead. No need to check any more. Mark as -1.
-                    endpts[i].len = -1;
-                } else if (epdetect1.jump && epdetect2.jump) {
-                    // TODO: complex. 2 jumps in total, should count as no jump.
-                } else if (!epdetect1.jump && !epdetect2.jump) {
-
-                    endpts[i].len = 1 + epdetect1.len + epdetect2.len;
-                    endpts[i].ep1 = epdetect1.ep;
-                    endpts[i].ep2 = epdetect2.ep;
-                } else {
-                    assert(epdetect1.jump || epdetect2.jump);
-                    endpts[i].len = (1 + epdetect1.len + epdetect2.len) - 1; // we shouldnt count the jumping blank
-                    endpts[i].ep1 = epdetect1.ep;
-                    endpts[i].ep2 = epdetect2.ep;
-                    endpts[i].jump = true;
-                    // TODO: complex. be careful with ****#* type.
-                }
-
-
-                // TODO: 
-                // 1. if it is not a live four, then igore it.
-                // 2. if it is not a live three, then igore it.
-                // 3. jump live four, jump live three
-
-            }
-
-            var numOfFour = 0;
-            var numOfThree = 0;
-
-            for (var i = 0; i < endpts.length; i++) {
-                switch (endpts[i].len) {
-                    case 4: numOfFour++; break;
-                    case 3: numOfThree++; break;
-                    default: // we don't care this.
-                }
-            }
-
-
-            for (var i = 0; i < endpts.length; i++) {
-                // only black side has JINSHOU limitation.
-                var hasJinshouLimit = (num % 2 == 1);
-
-                var success = (!endpts[i].jump)
-                    && (hasJinshouLimit ? (endpts[i].len == 5) : (endpts[i].len >= 5));
-
-                var jinshou = false;
-                if (hasJinshouLimit) {
-                    jinshou = (endpts[i].len > 5)
-                    || ((numOfFour > 1) && endpts[i].len == 4)
-                    || ((numOfThree > 1) && (endpts[i].len == 3));
-                }
-
-                if (success || jinshou) {
-                    color = (success) ? "#00ff00" : "#ff0000";
-
-                    hideShowButtons(true);
-                    UIDrawer.drawline(endpts[i].ep1, endpts[i].ep2, color);
-                }
-            }
-
+            PlayManager.play(p);
         }
 
 
