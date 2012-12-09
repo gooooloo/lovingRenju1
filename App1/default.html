@@ -108,6 +108,27 @@
 
             this.drawfillcircle(margin * 8, margin * 8, margin * 0.2, "#8f000000");
         }
+        UIDrawer.prototype.drawCircle = function(p, color, text) {
+            var xx = (p.x + 1) * margin;
+            var yy = (p.y + 1) * margin;
+
+            this.drawfillcircle(xx, yy, margin * 0.4, color);
+
+            var fontSize = "30";
+            var fontFace = "serif";
+            var textFillColor = "#ff0000";
+            var textBaseline = "middle";
+            var textAlign = "center";
+            var fontWeight = "normal";
+            var fontStyle = "normal";
+            context.textBaseline = textBaseline;
+            context.textAlign = textAlign;
+            context.font = fontWeight + " " + fontStyle + " " + fontSize + "px " + fontFace;
+            context.fillStyle = "#ff0000";
+            context.fillText(text, xx, yy);
+
+
+        }
 
         var dataManager = new DataManager();
         var uiDrawer = new UIDrawer();
@@ -276,7 +297,7 @@
             hideShowButtons(false);
             dataManager.addStep(p);
             num++;
-            drawCircle(p, getCircleColor(num), num);
+            uiDrawer.drawCircle(p, getCircleColor(num), num);
             setseezed(p, num);
             var endpts = new Array(dirs.length / 2);
             for (var i = 0; i < dirs.length / 2; i++) {
@@ -401,27 +422,6 @@
             context.closePath();
         }
 
-        function drawCircle(p, color, text) {
-            var xx = (p.x + 1) * margin;
-            var yy = (p.y + 1) * margin;
-
-            uiDrawer.drawfillcircle(xx, yy, margin * 0.4, color);
-
-            var fontSize = "30";
-            var fontFace = "serif";
-            var textFillColor = "#ff0000";
-            var textBaseline = "middle";
-            var textAlign = "center";
-            var fontWeight = "normal";
-            var fontStyle = "normal";
-            context.textBaseline = textBaseline;
-            context.textAlign = textAlign;
-            context.font = fontWeight + " " + fontStyle + " " + fontSize + "px " + fontFace;
-            context.fillStyle = "#ff0000";
-            context.fillText(text, xx, yy);
-
-
-        }
 
 
         function showmsg() {
