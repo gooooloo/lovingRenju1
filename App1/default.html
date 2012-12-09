@@ -59,6 +59,48 @@
             return this.steps;
         }
 
+        UIDrawer.prototype.drawbackground = function () {
+            // draw the QIPAN
+            context.fillStyle = "#ffd77f";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            context.beginPath();
+            // draw LINES
+            for (var i = 1; i < canvas.height / margin; i++) {
+                context.moveTo(i * margin, margin);
+                context.lineTo(i * margin, canvas.height - margin);
+            }
+            for (var i = 1; i < canvas.height / margin; i++) {
+                context.moveTo(margin, i * margin);
+                context.lineTo(canvas.width - margin, i * margin);
+            }
+            context.strokeStyle = "#000000";
+            context.lineWidth = 2;
+            context.stroke();
+            context.closePath();
+
+
+            var fontSize = "15";
+            var fontFace = "serif";
+            var textFillColor = "#ff0000";
+            var textBaseline = "middle";
+            var textAlign = "center";
+            var fontWeight = "normal";
+            var fontStyle = "normal";
+            context.textBaseline = textBaseline;
+            context.textAlign = textAlign;
+            context.font = fontWeight + " " + fontStyle + " " + fontSize + "px " + fontFace;
+            context.fillStyle = "#000000";
+            var h = new Array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O");
+            for (var i = 0; i < h.length; i++) {
+                context.fillText(h[i], (i + 1) * margin, margin / 2);
+                context.fillText(i + 1, margin / 2, (i + 1) * margin);
+
+            }
+
+            drawfillcircle(margin * 8, margin * 8, margin * 0.2, "#8f000000");
+        }
+
         var dataManager = new DataManager();
         var uiDrawer = new UIDrawer();
         var playManager = new PlayManager();
@@ -142,7 +184,8 @@
             dataManager.resetSeezed();
             num = 0;
             dataManager.resetSteps();
-            drawBackground();
+            uiDrawer.drawbackground();
+
         }
 
 
@@ -370,48 +413,6 @@
             context.fillText(text, xx, yy);
 
 
-        }
-
-        function drawBackground() {
-            // draw the QIPAN
-            context.fillStyle = "#ffd77f";
-            context.fillRect(0, 0, canvas.width, canvas.height);
-
-            context.beginPath();
-            // draw LINES
-            for (var i = 1; i < canvas.height / margin; i++) {
-                context.moveTo(i * margin, margin);
-                context.lineTo(i * margin, canvas.height - margin);
-            }
-            for (var i = 1; i < canvas.height / margin; i++) {
-                context.moveTo(margin, i * margin);
-                context.lineTo(canvas.width - margin, i * margin);
-            }
-            context.strokeStyle = "#000000";
-            context.lineWidth = 2;
-            context.stroke();
-            context.closePath();
-
-
-            var fontSize = "15";
-            var fontFace = "serif";
-            var textFillColor = "#ff0000";
-            var textBaseline = "middle";
-            var textAlign = "center";
-            var fontWeight = "normal";
-            var fontStyle = "normal";
-            context.textBaseline = textBaseline;
-            context.textAlign = textAlign;
-            context.font = fontWeight + " " + fontStyle + " " + fontSize + "px " + fontFace;
-            context.fillStyle = "#000000";
-            var h = new Array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O");
-            for (var i = 0; i < h.length; i++) {
-                context.fillText(h[i], (i + 1) * margin, margin / 2);
-                context.fillText(i + 1, margin / 2, (i + 1) * margin);
-
-            }
-
-            drawfillcircle(margin * 8, margin * 8, margin * 0.2, "#8f000000");
         }
 
         function drawfillcircle(x, y, r, color) {
