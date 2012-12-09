@@ -83,6 +83,11 @@
             dataManager.num = 0;
             dataManager.resetSteps();
         }
+        DataManager.prototype.updateOnPlay = function (p) {
+            dataManager.addStep(p);
+            dataManager.num++;
+            dataManager.setSeezed(p, dataManager.num);
+        }
 
         PlayManager.dirs = new Array(1, 2, 3, 4, 5, 6, 7, 8);
         PlayManager.playsaved = function (steps) {
@@ -91,11 +96,9 @@
             }
         }
         PlayManager.play = function (p) {
+            dataManager.updateOnPlay(p);
             hideShowButtons(false);
-            dataManager.addStep(p);
-            dataManager.num++;
             UIDrawer.drawCircle(p, UIDrawer.getCircleColor(dataManager.isBlackSide(dataManager.num)), dataManager.num);
-            dataManager.setSeezed(p, dataManager.num);
             var endpts = new Array(PlayManager.dirs.length / 2);
             for (var i = 0; i < PlayManager.dirs.length / 2; i++) {
                 endpts[i] = {
