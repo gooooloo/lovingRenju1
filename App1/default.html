@@ -15,16 +15,10 @@
     <script src="/js/default.js"></script>
 </head>
 <body>
-    <script>
-        var aaa = document.body.clientWidth;
-        var bbb = document.body.clientHeight;
-        var ccc = aaa > bbb ? bbb : aaa;
-
-    </script>
     <div id="ddd">
         <button id="resetbutton" type="button" onclick="onresetall()">再来一局</button>
         <button id="undo" type="button" onclick="onundo()">悔棋</button>
-        <canvas id="canvas" width="300" height="300"></canvas>
+        <canvas id="canvas"></canvas>
         <button id="dummy1" type="button"></button>
         <button id="dummy2" type="button"></button>
     </div>
@@ -149,7 +143,7 @@
 
             for (var i = 0; i < endpts.length; i++) {
                 // only black side has JINSHOU limitation.
-                var hasJinshouLimit = (dataManager.num % 2 == 1);
+                var hasJinshouLimit = dataManager.isBlackSide(dataManager.num);
 
                 var success = (!endpts[i].jump)
                     && (hasJinshouLimit ? (endpts[i].len == 5) : (endpts[i].len >= 5));
@@ -318,14 +312,15 @@
         }
 
         var dataManager = new DataManager();
-
-
-
+        
         var canvas = document.getElementById("canvas");
-        canvas.width = ccc - 30;
+        var context = canvas.getContext("2d");
+
+        var aaa = document.body.clientWidth;
+        var bbb = document.body.clientHeight;
+        canvas.width = (aaa > bbb ? bbb : aaa) - 30;
         canvas.height = canvas.width;
         canvas.style.position = "fix"
-        var context = canvas.getContext("2d");
         UIDrawer.margin = canvas.width / 16;
 
         function assert(b) { if (!b) { alert("assert fail!"); } }
