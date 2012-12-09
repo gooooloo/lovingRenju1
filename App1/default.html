@@ -59,6 +59,14 @@
             return this.steps;
         }
 
+        UIDrawer.prototype.drawfillcircle = function(x, y, r, color) {
+
+                context.beginPath();
+                context.fillStyle = color;
+                context.arc(x, y, parseInt(r), 0, Math.PI * 2, true);
+                context.fill();
+                context.closePath();
+        }
         UIDrawer.prototype.drawbackground = function () {
             // draw the QIPAN
             context.fillStyle = "#ffd77f";
@@ -98,7 +106,7 @@
 
             }
 
-            drawfillcircle(margin * 8, margin * 8, margin * 0.2, "#8f000000");
+            this.drawfillcircle(margin * 8, margin * 8, margin * 0.2, "#8f000000");
         }
 
         var dataManager = new DataManager();
@@ -397,7 +405,7 @@
             var xx = (p.x + 1) * margin;
             var yy = (p.y + 1) * margin;
 
-            drawfillcircle(xx, yy, margin * 0.4, color);
+            uiDrawer.drawfillcircle(xx, yy, margin * 0.4, color);
 
             var fontSize = "30";
             var fontFace = "serif";
@@ -415,17 +423,9 @@
 
         }
 
-        function drawfillcircle(x, y, r, color) {
-
-            context.beginPath();
-            context.fillStyle = color;
-            context.arc(x, y, parseInt(r), 0, Math.PI * 2, true);
-            context.fill();
-            context.closePath();
-        }
 
         function showmsg() {
-            drawCircle({ x: 1, y: 1 }, "#ff0000", num);
+            uiDrawer.drawCircle({ x: 1, y: 1 }, "#ff0000", num);
         }
 
     </script>
