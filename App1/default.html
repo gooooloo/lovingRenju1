@@ -34,11 +34,11 @@
         var ResultManager = function () { }
 
         ResultManager.onJinshou = function (p1, p2) {
-            hideShowButtons(true);
+            myUIDrawerClass.hideShowButtons(true);
             myUIDrawerClass.drawline(p1, p2, myUIDrawerClass.getJinshouLineColor());
         }
         ResultManager.onSuccess = function (p1, p2) {
-            hideShowButtons(true);
+            myUIDrawerClass.hideShowButtons(true);
             myUIDrawerClass.drawline(p1, p2, myUIDrawerClass.getSuccessfulLineColor());
         }
 
@@ -102,7 +102,7 @@
         }
         PlayManager.play = function (p) {
             dataManager.updateOnPlay(p);
-            hideShowButtons(false);
+            myUIDrawerClass.hideShowButtons(false);
             myUIDrawerClass.drawCircle(p, myUIDrawerClass.getCircleColor(dataManager.isBlackSide(dataManager.num)), dataManager.num);
             var endpts = new Array(PlayManager.dirs.length / 2);
             for (var i = 0; i < PlayManager.dirs.length / 2; i++) {
@@ -328,6 +328,31 @@
             context.stroke();
             context.closePath();
         }
+        UIDrawer.hideShowElement = function (id, visible) {
+            document.getElementById(id).style.visibility = visible ? "visible" : "hidden";
+
+            //document.getElementById(id).style.display = visible ? "inline" : "none";
+        }
+        UIDrawer.getElementVisibility = function (id) {
+            return document.getElementById(id).style.visibility == "hidden" ? false : true;
+        }
+        UIDrawer.toggleButtonsVisibility = function () {
+
+            var btns = ["resetbutton", "undo"];
+            for (var i = 0; i < btns.length; i++) {
+                var v = UIDrawer.getElementVisibility(btns[i]);
+
+                UIDrawer.hideShowElement(btns[i], !v);
+            }
+        }
+        UIDrawer.hideShowButtons = function (visible) {
+            var btns = ["resetbutton", "undo"];
+            for (var i = 0; i < btns.length; i++) {
+                UIDrawer.hideShowElement(btns[i], visible);
+            }
+            UIDrawer.hideShowElement("dummy1", false);
+            UIDrawer.hideShowElement("dummy2", false);
+        }
         var myUIDrawerClass = UIDrawer;
 
         var dataManager = new DataManager();
@@ -338,30 +363,30 @@
 
         function assert(b) { if (!b) { alert("assert fail!"); } }
 
-        function hideShowElement(id, visible) {
+        UIDrawer.hideShowElement = function (id, visible) {
             document.getElementById(id).style.visibility = visible ? "visible" : "hidden";
 
             //document.getElementById(id).style.display = visible ? "inline" : "none";
         }
-        function getElementVisibility(id) {
+        UIDrawer.getElementVisibility = function (id) {
             return document.getElementById(id).style.visibility == "hidden" ? false : true;
         }
-        function toggleButtonsVisibility() {
+        UIDrawer.toggleButtonsVisibility = function () {
 
             var btns = ["resetbutton", "undo"];
             for (var i = 0; i < btns.length; i++) {
-                var v = getElementVisibility(btns[i]);
+                var v = UIDrawer.getElementVisibility(btns[i]);
 
-                hideShowElement(btns[i], !v);
+                UIDrawer.hideShowElement(btns[i], !v);
             }
         }
-        function hideShowButtons(visible) {
+        UIDrawer.hideShowButtons = function (visible) {
             var btns = ["resetbutton", "undo"];
             for (var i = 0; i < btns.length; i++) {
-                hideShowElement(btns[i], visible);
+                UIDrawer.hideShowElement(btns[i], visible);
             }
-            hideShowElement("dummy1", false);
-            hideShowElement("dummy2", false);
+            UIDrawer.hideShowElement("dummy1", false);
+            UIDrawer.hideShowElement("dummy2", false);
         }
 
         function onundo() {
@@ -404,7 +429,11 @@
         dummyUIDrawer.drawCircle = function () { };
         dummyUIDrawer.drawline = function () { };
         dummyUIDrawer.drawbackground = UIDrawer.drawbackground;
-        myUIDrawerClass = dummyUIDrawer;
+        dummyUIDrawer.hideShowElement = function () { };
+        dummyUIDrawer.getElementVisibility = function () { };
+        dummyUIDrawer.toggleButtonsVisibility = function () { };
+        dummyUIDrawer.hideShowButtons = function () { };
+        //myUIDrawerClass = dummyUIDrawer;
 
 
         var aaa = document.body.clientWidth;
@@ -416,11 +445,11 @@
 
         document.onclick = function onDocumentClick() {
             if (event.srcElement.id != "canvas") {
-                toggleButtonsVisibility();
+                myUIDrawerClass.toggleButtonsVisibility();
             }
         }
 
-        hideShowButtons(false);
+        myUIDrawerClass.hideShowButtons(false);
 
         initgame();
 
