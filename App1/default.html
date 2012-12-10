@@ -105,10 +105,8 @@
                 PlayManager.play(steps[i]);
             }
         }
-        PlayManager.play = function (p) {
-            dataManager.updateOnPlay(p);
-            myUIDrawerClass.hideShowButtons(false);
-            myUIDrawerClass.drawCircle(p, myUIDrawerClass.getCircleColor(dataManager.isBlackSide(dataManager.num)), dataManager.num);
+        PlayManager.judgeStatusAfterPlayed = function (p) {
+            assert(!dataManager.emptySide(p)); // designed only for played position.
             var endpts = new Array(PlayManager.dirs.length / 2);
             for (var i = 0; i < PlayManager.dirs.length / 2; i++) {
                 endpts[i] = {
@@ -178,6 +176,12 @@
                     ResultManager.onJinshou(endpts[i].ep1, endpts[i].ep2);
                 }
             }
+        }
+        PlayManager.play = function (p) {
+            dataManager.updateOnPlay(p);
+            myUIDrawerClass.hideShowButtons(false);
+            myUIDrawerClass.drawCircle(p, myUIDrawerClass.getCircleColor(dataManager.isBlackSide(dataManager.num)), dataManager.num);
+            PlayManager.judgeStatusAfterPlayed(p);
         }
         PlayManager.next = function (p, d) {
             // TODO: boundary condition checking
