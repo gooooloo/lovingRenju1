@@ -52,7 +52,12 @@
     <PackageCertificateThumbprint>5B5702F4073DAD789983A422FEAD1A0829AC7B7B</PackageCertificateThumbprint>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="logging.properties" />
+    <Content Include="readme.txt" />
+    <Content Include="testRunner.html" />
     <None Include="App1_StoreKey.pfx" />
+    <Content Include="build.xml" />
+    <Content Include="build_aggregate.xml" />
     <Content Include="css\default.css" />
     <Content Include="default.html" />
     <Content Include="images\logo.png" />
@@ -62,6 +67,7 @@
     <AppxManifest Include="package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="jsunit.properties.sample" />
     <Content Include="js\default.js" />
     <None Include="Package.StoreAssociation.xml" />
     <None Include="App1_TemporaryKey.pfx" />

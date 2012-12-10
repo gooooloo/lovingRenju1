@@ -33,11 +33,16 @@
         var PlayManager = function () { }
         var ResultManager = function () { }
 
+        ResultManager.successNum = 0;
+        ResultManager.reset = function () {
+            ResultManager.successNum = 0;
+        }
         ResultManager.onJinshou = function (p1, p2) {
             myUIDrawerClass.hideShowButtons(true);
             myUIDrawerClass.drawline(p1, p2, myUIDrawerClass.getJinshouLineColor());
         }
         ResultManager.onSuccess = function (p1, p2) {
+            ResultManager.successNum++;
             myUIDrawerClass.hideShowButtons(true);
             myUIDrawerClass.drawline(p1, p2, myUIDrawerClass.getSuccessfulLineColor());
         }
@@ -419,33 +424,6 @@
             PlayManager.play(p);
         }
 
-        // test support
-        var dummyUIDrawer = function () { }
-        dummyUIDrawer.getIndex = UIDrawer.getIndex;
-        dummyUIDrawer.getCircleColor = UIDrawer.getCircleColor;
-        dummyUIDrawer.getSuccessfulLineColor = UIDrawer.getSuccessfulLineColor;
-        dummyUIDrawer.getJinshouLineColor = UIDrawer.getJinshouLineColor;
-        dummyUIDrawer.drawfillcircle = function () { };
-        dummyUIDrawer.drawCircle = function () { };
-        dummyUIDrawer.drawline = function () { };
-        dummyUIDrawer.drawbackground = UIDrawer.drawbackground;
-        dummyUIDrawer.hideShowElement = function () { };
-        dummyUIDrawer.getElementVisibility = function () { };
-        dummyUIDrawer.toggleButtonsVisibility = function () { };
-        dummyUIDrawer.hideShowButtons = function () { };
-        //myUIDrawerClass = dummyUIDrawer;
-
-        var testAddPlay = function(steps, xx,yy){
-            steps.push({ x: xx, y: yy });
-        }
-        var testBasic = function () {
-            var steps = new Array();
-            testAddPlay(steps, 8, 8);
-            testAddPlay(steps, 7, 8);
-            testAddPlay(steps, 8, 9);
-            testAddPlay(steps, 7, 9);
-            PlayManager.playsaved(steps);
-        }
 
 
         var aaa = document.body.clientWidth;
@@ -467,8 +445,69 @@
 
         canvas.addEventListener("click", onclick, false);
 
-        var testFunc = testBasic;
-        testFunc();
+    </script>
+
+
+    <script type='text/javascript' src='./jsunit/app/jsUnitCore.js'></script>
+    <script type='text/javascript'>
+
+
+        function setUp() {
+            // perform fixture set up
+        }
+        function tearDown() {
+            // clean up
+        }
+
+
+        // test support
+        var dummyUIDrawer = function () { }
+        dummyUIDrawer.getIndex = UIDrawer.getIndex;
+        dummyUIDrawer.getCircleColor = UIDrawer.getCircleColor;
+        dummyUIDrawer.getSuccessfulLineColor = UIDrawer.getSuccessfulLineColor;
+        dummyUIDrawer.getJinshouLineColor = UIDrawer.getJinshouLineColor;
+        dummyUIDrawer.drawfillcircle = function () { };
+        dummyUIDrawer.drawCircle = function () { };
+        dummyUIDrawer.drawline = function () { };
+        dummyUIDrawer.drawbackground = UIDrawer.drawbackground;
+        dummyUIDrawer.hideShowElement = function () { };
+        dummyUIDrawer.getElementVisibility = function () { };
+        dummyUIDrawer.toggleButtonsVisibility = function () { };
+        dummyUIDrawer.hideShowButtons = function () { };
+        //myUIDrawerClass = dummyUIDrawer;
+
+        function doAddPlay(steps, xx, yy) {
+            steps.push({ x: xx, y: yy });
+        }
+        /*
+         * this is a test function to help play black directly.
+         * it is tightly coupled with the implementation of DataManager
+        */
+        function playBalckDirectly(xx, yy) {
+            // TODO.
+        }
+        /*
+         * this is a test function to help play black directly.
+         * it is tightly coupled with the implementation of DataManager
+        */
+        function playWhiteDirectly(xx, yy) {
+            // TODO.
+        }
+        function testBasic() {
+            var steps = new Array();
+            doAddPlay(steps, 8, 5);
+            doAddPlay(steps, 7, 5);
+            doAddPlay(steps, 8, 6);
+            doAddPlay(steps, 7, 6);
+            doAddPlay(steps, 8, 7);
+            doAddPlay(steps, 7, 7);
+            doAddPlay(steps, 8, 8);
+            doAddPlay(steps, 7, 8);
+            doAddPlay(steps, 8, 9);
+            ResultManager.reset();
+            PlayManager.playsaved(steps);
+            assertEquals(1, ResultManager.successNum);
+        }
     </script>
 </body>
 </html>
