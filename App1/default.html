@@ -435,6 +435,18 @@
         dummyUIDrawer.hideShowButtons = function () { };
         //myUIDrawerClass = dummyUIDrawer;
 
+        var testAddPlay = function(steps, xx,yy){
+            steps.push({ x: xx, y: yy });
+        }
+        var testBasic = function () {
+            var steps = new Array();
+            testAddPlay(steps, 8, 8);
+            testAddPlay(steps, 7, 8);
+            testAddPlay(steps, 8, 9);
+            testAddPlay(steps, 7, 9);
+            PlayManager.playsaved(steps);
+        }
+
 
         var aaa = document.body.clientWidth;
         var bbb = document.body.clientHeight;
@@ -454,6 +466,9 @@
         initgame();
 
         canvas.addEventListener("click", onclick, false);
+
+        var testFunc = testBasic;
+        testFunc();
     </script>
 </body>
 </html>
