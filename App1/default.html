@@ -335,12 +335,6 @@
         var canvas = document.getElementById("canvas");
         var context = canvas.getContext("2d");
 
-        var aaa = document.body.clientWidth;
-        var bbb = document.body.clientHeight;
-        canvas.width = (aaa > bbb ? bbb : aaa) - 30;
-        canvas.height = canvas.width;
-        canvas.style.position = "fix"
-        myUIDrawerClass.margin = canvas.width / 16;
 
         function assert(b) { if (!b) { alert("assert fail!"); } }
 
@@ -369,18 +363,6 @@
             hideShowElement("dummy1", false);
             hideShowElement("dummy2", false);
         }
-
-        document.onclick = function onDocumentClick() {
-            if (event.srcElement.id != "canvas") {
-                toggleButtonsVisibility();
-            }
-        }
-
-        hideShowButtons(false);
-
-        initgame();
-
-        canvas.addEventListener("click", onclick, false);
 
         function onundo() {
             var mysteps = dataManager.getSteps();
@@ -422,7 +404,27 @@
         dummyUIDrawer.drawCircle = function () { };
         dummyUIDrawer.drawline = function () { };
         dummyUIDrawer.drawbackground = UIDrawer.drawbackground;
-        //myUIDrawerClass = dummyUIDrawer;
+        myUIDrawerClass = dummyUIDrawer;
+
+
+        var aaa = document.body.clientWidth;
+        var bbb = document.body.clientHeight;
+        canvas.width = (aaa > bbb ? bbb : aaa) - 30;
+        canvas.height = canvas.width;
+        canvas.style.position = "fix"
+        myUIDrawerClass.margin = canvas.width / 16;
+
+        document.onclick = function onDocumentClick() {
+            if (event.srcElement.id != "canvas") {
+                toggleButtonsVisibility();
+            }
+        }
+
+        hideShowButtons(false);
+
+        initgame();
+
+        canvas.addEventListener("click", onclick, false);
     </script>
 </body>
 </html>
