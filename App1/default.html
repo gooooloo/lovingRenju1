@@ -411,6 +411,7 @@
         }
 
         function initgame() {
+            ResultManager.reset();
             dataManager.resetData();
             myUIDrawerClass.drawbackground();
 
@@ -480,37 +481,57 @@
         dummyUIDrawer.hideShowButtons = function () { };
         //myUIDrawerClass = dummyUIDrawer;
 
-        function doAddPlay(steps, xx, yy) {
-            steps.push({ x: xx, y: yy });
-        }
+        var myUT = function () { }
+        myUT.lastPlayed = undefined;
         /*
          * this is a test function to help play black directly.
          * it is tightly coupled with the implementation of DataManager
         */
         function playBalckDirectly(xx, yy) {
-            // TODO.
+            if (dataManager.isBlackSide(dataManager.num)) {
+                dataManager.num++;
+            }
+            myUT.lastPlayed = { x: xx, y: yy };
+            dataManager.updateOnPlay(myUT.lastPlayed);
         }
         /*
          * this is a test function to help play black directly.
          * it is tightly coupled with the implementation of DataManager
         */
         function playWhiteDirectly(xx, yy) {
-            // TODO.
+            if (!dataManager.isBlackSide(dataManager.num)) {
+                dataManager.num++;
+            }
+            myUT.lastPlayed = { x: xx, y: yy };
+            dataManager.updateOnPlay(myUT.lastPlayed);
         }
-        function testBasic() {
-            var steps = new Array();
-            doAddPlay(steps, 8, 5);
-            doAddPlay(steps, 7, 5);
-            doAddPlay(steps, 8, 6);
-            doAddPlay(steps, 7, 6);
-            doAddPlay(steps, 8, 7);
-            doAddPlay(steps, 7, 7);
-            doAddPlay(steps, 8, 8);
-            doAddPlay(steps, 7, 8);
-            doAddPlay(steps, 8, 9);
-            ResultManager.reset();
-            PlayManager.playsaved(steps);
+        function testBasicSuccess() {
+            initgame();
+            playBalckDirectly(7, 2);
+            playBalckDirectly(7, 3);
+            playBalckDirectly(7, 4);
+            playBalckDirectly(7, 5);
+            playBalckDirectly(7, 6);
+            PlayManager.judgeStatusAfterPlayed(myUT.lastPlayed);
             assertEquals(1, ResultManager.successNum);
+        }
+        function testBasicNotSuccess() {
+            initgame();
+            playBalckDirectly(7, 2);
+            PlayManager.judgeStatusAfterPlayed(myUT.lastPlayed);
+            assertEquals(0, ResultManager.successNum);
+
+            playBalckDirectly(7, 3);
+            PlayManager.judgeStatusAfterPlayed(myUT.lastPlayed);
+            assertEquals(0, ResultManager.successNum);
+
+            playBalckDirectly(7, 4);
+            PlayManager.judgeStatusAfterPlayed(myUT.lastPlayed);
+            assertEquals(0, ResultManager.successNum);
+
+            playBalckDirectly(7, 5);
+            PlayManager.judgeStatusAfterPlayed(myUT.lastPlayed);
+            assertEquals(0, ResultManager.successNum);
         }
     </script>
 </body>
