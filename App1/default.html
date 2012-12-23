@@ -33,13 +33,18 @@
         var PlayManager = function () { }
         var ResultManager = function () { }
 
+        ResultManager.successNum = 0;
+        ResultManager.reset = function () {
+            ResultManager.successNum = 0;
+        }
         ResultManager.onJinshou = function (p1, p2) {
-            hideShowButtons(true);
-            UIDrawer.drawline(p1, p2, UIDrawer.getJinshouLineColor());
+            myUIDrawerClass.hideShowButtons(true);
+            myUIDrawerClass.drawline(p1, p2, myUIDrawerClass.getJinshouLineColor());
         }
         ResultManager.onSuccess = function (p1, p2) {
-            hideShowButtons(true);
-            UIDrawer.drawline(p1, p2, UIDrawer.getSuccessfulLineColor());
+            ResultManager.successNum++;
+            myUIDrawerClass.hideShowButtons(true);
+            myUIDrawerClass.drawline(p1, p2, myUIDrawerClass.getSuccessfulLineColor());
         }
 
         DataManager.prototype.num = 0;
@@ -93,16 +98,15 @@
             dataManager.setSeezed(p, dataManager.num);
         }
 
+
         PlayManager.dirs = new Array(1, 2, 3, 4, 5, 6, 7, 8);
         PlayManager.playsaved = function (steps) {
             for (var i = 0; i < steps.length; i++) {
                 PlayManager.play(steps[i]);
             }
         }
-        PlayManager.play = function (p) {
-            dataManager.updateOnPlay(p);
-            hideShowButtons(false);
-            UIDrawer.drawCircle(p, UIDrawer.getCircleColor(dataManager.isBlackSide(dataManager.num)), dataManager.num);
+        PlayManager.judgeStatusAfterPlayed = function (p) {
+            assert(!dataManager.emptySide(p)); // designed only for played position.
             var endpts = new Array(PlayManager.dirs.length / 2);
             for (var i = 0; i < PlayManager.dirs.length / 2; i++) {
                 endpts[i] = {
@@ -173,6 +177,12 @@
                 }
             }
         }
+        PlayManager.play = function (p) {
+            dataManager.updateOnPlay(p);
+            myUIDrawerClass.hideShowButtons(false);
+            myUIDrawerClass.drawCircle(p, myUIDrawerClass.getCircleColor(dataManager.isBlackSide(dataManager.num)), dataManager.num);
+            PlayManager.judgeStatusAfterPlayed(p);
+        }
         PlayManager.next = function (p, d) {
             // TODO: boundary condition checking
             if (d == PlayManager.dirs[0])
@@ -236,6 +246,7 @@
             }
             return ret;
         }
+
 
         UIDrawer.getSuccessfulLineColor = function () {
             return "#00ff00";
@@ -326,58 +337,66 @@
             context.stroke();
             context.closePath();
         }
+        UIDrawer.hideShowElement = function (id, visible) {
+            document.getElementById(id).style.visibility = visible ? "visible" : "hidden";
+
+            //document.getElementById(id).style.display = visible ? "inline" : "none";
+        }
+        UIDrawer.getElementVisibility = function (id) {
+            return document.getElementById(id).style.visibility == "hidden" ? false : true;
+        }
+        UIDrawer.toggleButtonsVisibility = function () {
+
+            var btns = ["resetbutton", "undo"];
+            for (var i = 0; i < btns.length; i++) {
+                var v = UIDrawer.getElementVisibility(btns[i]);
+
+                UIDrawer.hideShowElement(btns[i], !v);
+            }
+        }
+        UIDrawer.hideShowButtons = function (visible) {
+            var btns = ["resetbutton", "undo"];
+            for (var i = 0; i < btns.length; i++) {
+                UIDrawer.hideShowElement(btns[i], visible);
+            }
+            UIDrawer.hideShowElement("dummy1", false);
+            UIDrawer.hideShowElement("dummy2", false);
+        }
+        var myUIDrawerClass = UIDrawer;
 
         var dataManager = new DataManager();
 
         var canvas = document.getElementById("canvas");
         var context = canvas.getContext("2d");
 
-        var aaa = document.body.clientWidth;
-        var bbb = document.body.clientHeight;
-        canvas.width = (aaa > bbb ? bbb : aaa) - 30;
-        canvas.height = canvas.width;
-        canvas.style.position = "fix"
-        UIDrawer.margin = canvas.width / 16;
 
         function assert(b) { if (!b) { alert("assert fail!"); } }
 
-        function hideShowElement(id, visible) {
+        UIDrawer.hideShowElement = function (id, visible) {
             document.getElementById(id).style.visibility = visible ? "visible" : "hidden";
 
             //document.getElementById(id).style.display = visible ? "inline" : "none";
         }
-        function getElementVisibility(id) {
+        UIDrawer.getElementVisibility = function (id) {
             return document.getElementById(id).style.visibility == "hidden" ? false : true;
         }
-        function toggleButtonsVisibility() {
+        UIDrawer.toggleButtonsVisibility = function () {
 
             var btns = ["resetbutton", "undo"];
             for (var i = 0; i < btns.length; i++) {
-                var v = getElementVisibility(btns[i]);
+                var v = UIDrawer.getElementVisibility(btns[i]);
 
-                hideShowElement(btns[i], !v);
+                UIDrawer.hideShowElement(btns[i], !v);
             }
         }
-        function hideShowButtons(visible) {
+        UIDrawer.hideShowButtons = function (visible) {
             var btns = ["resetbutton", "undo"];
             for (var i = 0; i < btns.length; i++) {
-                hideShowElement(btns[i], visible);
+                UIDrawer.hideShowElement(btns[i], visible);
             }
-            hideShowElement("dummy1", false);
-            hideShowElement("dummy2", false);
+            UIDrawer.hideShowElement("dummy1", false);
+            UIDrawer.hideShowElement("dummy2", false);
         }
-
-        document.onclick = function onDocumentClick() {
-            if (event.srcElement.id != "canvas") {
-                toggleButtonsVisibility();
-            }
-        }
-
-        hideShowButtons(false);
-
-        initgame();
-
-        canvas.addEventListener("click", onclick, false);
 
         function onundo() {
             var mysteps = dataManager.getSteps();
@@ -392,13 +411,14 @@
         }
 
         function initgame() {
+            ResultManager.reset();
             dataManager.resetData();
-            UIDrawer.drawbackground();
+            myUIDrawerClass.drawbackground();
 
         }
 
         function onclick(e) {
-            var p = { x: UIDrawer.getIndex(e.offsetX), y: UIDrawer.getIndex(e.offsetY) };
+            var p = { x: myUIDrawerClass.getIndex(e.offsetX), y: myUIDrawerClass.getIndex(e.offsetY) };
             if (!dataManager.valid(p)) {
                 return;
             }
@@ -407,6 +427,111 @@
                 return;
             }
             PlayManager.play(p);
+        }
+
+
+
+        var aaa = document.body.clientWidth;
+        var bbb = document.body.clientHeight;
+        canvas.width = (aaa > bbb ? bbb : aaa) - 30;
+        canvas.height = canvas.width;
+        canvas.style.position = "fix"
+        myUIDrawerClass.margin = canvas.width / 16;
+
+        document.onclick = function onDocumentClick() {
+            if (event.srcElement.id != "canvas") {
+                myUIDrawerClass.toggleButtonsVisibility();
+            }
+        }
+
+        myUIDrawerClass.hideShowButtons(false);
+
+        initgame();
+
+        canvas.addEventListener("click", onclick, false);
+
+    </script>
+
+
+    <script type='text/javascript' src='./jsunit/app/jsUnitCore.js'></script>
+    <script type='text/javascript'>
+
+
+        function setUp() {
+            // perform fixture set up
+        }
+        function tearDown() {
+            // clean up
+        }
+
+
+        // test support
+        var dummyUIDrawer = function () { }
+        dummyUIDrawer.getIndex = UIDrawer.getIndex;
+        dummyUIDrawer.getCircleColor = UIDrawer.getCircleColor;
+        dummyUIDrawer.getSuccessfulLineColor = UIDrawer.getSuccessfulLineColor;
+        dummyUIDrawer.getJinshouLineColor = UIDrawer.getJinshouLineColor;
+        dummyUIDrawer.drawfillcircle = function () { };
+        dummyUIDrawer.drawCircle = function () { };
+        dummyUIDrawer.drawline = function () { };
+        dummyUIDrawer.drawbackground = UIDrawer.drawbackground;
+        dummyUIDrawer.hideShowElement = function () { };
+        dummyUIDrawer.getElementVisibility = function () { };
+        dummyUIDrawer.toggleButtonsVisibility = function () { };
+        dummyUIDrawer.hideShowButtons = function () { };
+        //myUIDrawerClass = dummyUIDrawer;
+
+        var myUT = function () { }
+        myUT.lastPlayed = undefined;
+        /*
+         * this is a test function to help play black directly.
+         * it is tightly coupled with the implementation of DataManager
+        */
+        function playBalckDirectly(xx, yy) {
+            if (dataManager.isBlackSide(dataManager.num)) {
+                dataManager.num++;
+            }
+            myUT.lastPlayed = { x: xx, y: yy };
+            dataManager.updateOnPlay(myUT.lastPlayed);
+        }
+        /*
+         * this is a test function to help play black directly.
+         * it is tightly coupled with the implementation of DataManager
+        */
+        function playWhiteDirectly(xx, yy) {
+            if (!dataManager.isBlackSide(dataManager.num)) {
+                dataManager.num++;
+            }
+            myUT.lastPlayed = { x: xx, y: yy };
+            dataManager.updateOnPlay(myUT.lastPlayed);
+        }
+        function testBasicSuccess() {
+            initgame();
+            playBalckDirectly(7, 2);
+            playBalckDirectly(7, 3);
+            playBalckDirectly(7, 4);
+            playBalckDirectly(7, 5);
+            playBalckDirectly(7, 6);
+            PlayManager.judgeStatusAfterPlayed(myUT.lastPlayed);
+            assertEquals(1, ResultManager.successNum);
+        }
+        function testBasicNotSuccess() {
+            initgame();
+            playBalckDirectly(7, 2);
+            PlayManager.judgeStatusAfterPlayed(myUT.lastPlayed);
+            assertEquals(0, ResultManager.successNum);
+
+            playBalckDirectly(7, 3);
+            PlayManager.judgeStatusAfterPlayed(myUT.lastPlayed);
+            assertEquals(0, ResultManager.successNum);
+
+            playBalckDirectly(7, 4);
+            PlayManager.judgeStatusAfterPlayed(myUT.lastPlayed);
+            assertEquals(0, ResultManager.successNum);
+
+            playBalckDirectly(7, 5);
+            PlayManager.judgeStatusAfterPlayed(myUT.lastPlayed);
+            assertEquals(0, ResultManager.successNum);
         }
     </script>
 </body>
