@@ -3,16 +3,8 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>App1</title>
+    <title>五子棋</title>
 
-    <!-- WinJS references -->
-    <link href="//Microsoft.WinJS.1.0/css/ui-dark.css" rel="stylesheet" />
-    <script src="//Microsoft.WinJS.1.0/js/base.js"></script>
-    <script src="//Microsoft.WinJS.1.0/js/ui.js"></script>
-
-    <!-- App1 references -->
-    <link href="/css/default.css" rel="stylesheet" />
-    <script src="/js/default.js"></script>
 </head>
 <body>
     <div id="ddd">
@@ -431,8 +423,8 @@
 
 
 
-        var aaa = document.body.clientWidth;
-        var bbb = document.body.clientHeight;
+        var aaa = window.innerWidth;
+        var bbb = window.innerHeight;
         canvas.width = (aaa > bbb ? bbb : aaa) - 30;
         canvas.height = canvas.width;
         canvas.style.position = "fix"
